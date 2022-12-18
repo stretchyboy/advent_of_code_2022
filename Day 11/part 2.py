@@ -1,7 +1,7 @@
 # Day 11 : Challenge 2
 
-import gmpy2
-from codetiming import Timer
+#import gmpy2
+#from codetiming import Timer
 #from memory_profiler import profile
 
 #fp=open('memory_profiler.log','w+')
@@ -21,7 +21,7 @@ class Monkeys():
             self.monkeys[i].clockspace = clockspace
             
     
-    @Timer(name="Run", text="{name} {tick} - Elapsed time: {:0.4f} seconds")
+    #@Timer(name="Run", text="{name} {tick} - Elapsed time: {:0.4f} seconds")
     def run(self):
         self.reset()
         self.j = 0 
@@ -32,7 +32,7 @@ class Monkeys():
                 print("Round", self.j, [k.getScore() for k in self.monkeys])
           
     
-    @Timer(name="Round", min=10, text="{name} {tick} - Elapsed time: {:0.4f} seconds")
+    #@Timer(name="Round", min=10, text="{name} {tick} - Elapsed time: {:0.4f} seconds")
     def round(self):
         for i in range(len(self.monkeys)):
             #print("Monkey", i)
@@ -168,12 +168,13 @@ class Monkey():
     
     def getScore(self):
         return self.inspections 
-        
+'''        
 with open("Day 11/test.txt","r") as file:
     monkeys = Monkeys(file.read())
     monkeys.run()
     assert monkeys.monkeyBusiness() == 2713310158
- 
+'''
+
 with open("Day 11/input.txt","r") as file2:
     monkeys2 = Monkeys(file2.read())
     monkeys2.run()
