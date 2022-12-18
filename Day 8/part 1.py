@@ -32,43 +32,31 @@ class TreeMap():
     
     def countVisibleTrees(self):
         treeList = []
-        self.aMaxes = [0,0,0,0]
-        self.aPosition = [0,0,0,0]
-    
+        self.aMaxes = [[-1]*self.width,[-1]*self.height,[-1]*self.width,[-1]*self.height]
+        
         for top in range(self.height):
-            
-            self.aPosition[TOP]     = top
-            self.aPosition[BOTTOM]  = self.height - (1 + top)
+            bottom  = self.height - (1 + top)
             for left in range(self.width):
-                self.aPosition[LEFT]    = left
-                self.aPosition[RIGHT]   = self.width - (1 + left)
-
-                for yDirection in [TOP, BOTTOM]:
-                    
-                    treeValue = int(self.aLines[self.aPosition[yDirection]][self.aPosition[xDirection]])
-                    if treeValue > self.aMaxes[yDirection]:
-                        treeList.append((self.aPosition[yDirection],left))
-                        self.aMaxes[yDirection] = treeValue
+                right   = self.width - (1 + left)
+                treeValue = int(self.aLines[top][left])
+                if treeValue > self.aMaxes[TOP][left]:
+                    treeList.append((top,left))
+                    self.aMaxes[TOP][left] = treeValue
                 
-                    treeValue = int(self.aLines[top][])
-                    if treeValue > self.aMaxes[xDirection]:
-                        treeList.append((top, self.aPosition[xDirection]))
-                        self.aMaxes[xDirection] = treeValue
+                if treeValue > self.aMaxes[LEFT][top]:
+                    treeList.append((top,left))
+                    self.aMaxes[LEFT][top] = treeValue
                 
-                '''
-                #print(self.aPosition) 
-                for yDirection in [TOP, BOTTOM]:
-                    treeValue = int(self.aLines[self.aPosition[yDirection]][left])
-                    if treeValue > self.aMaxes[yDirection]:
-                        treeList.append((self.aPosition[yDirection],left))
-                        self.aMaxes[yDirection] = treeValue
-                for xDirection in [LEFT, RIGHT]:
-                    treeValue = int(self.aLines[top][self.aPosition[xDirection]])
-                    if treeValue > self.aMaxes[xDirection]:
-                        treeList.append((top, self.aPosition[xDirection]))
-                        self.aMaxes[xDirection] = treeValue
-                    #print(xDirection, self.aLines[top][self.aPosition[xDirection]])
-                '''
+                treeValue = int(self.aLines[bottom][right])
+                if treeValue > self.aMaxes[BOTTOM][right]:
+                    treeList.append((bottom,right))
+                    self.aMaxes[BOTTOM][right] = treeValue
+                
+                if treeValue > self.aMaxes[RIGHT][bottom]:
+                    treeList.append((bottom,right))
+                    self.aMaxes[RIGHT][bottom] = treeValue
+                
+                
         
         print("treeList",treeList)
         print("treeList",set(treeList))

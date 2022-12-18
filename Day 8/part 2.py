@@ -1,79 +1,131 @@
-# Day 7 : Challenge 2
+# Day 8 : Challenge 1
 
 
-class Listing():
-    aCurrent = []
-    dSizes = {"/" : 0}
+
+## idea one
+# build array of tuples 
+#   key (coords)
+#   The trees to that point from the outside 
+#filter the list
+#turn into a set and count the set
+
+## idea 2 iterate in from the edges
+## add coords to list if still visible (and set new max)
+#turn into a set and count the set
+
+LEFT    = 0
+TOP     = 1
+RIGHT   = 2
+BOTTOM  = 3
+
+class TreeMap():
+    
     def __init__(self, aLines) -> None:
-        self.aCurrent = []
-        self.aCurrentKeys = []
-        self.dSizes = {"/" : 0}
-        self.iFileSystem = 70000000
-        self.requiredSpace = 30000000
-        for sLine in aLines :
-            aLine = sLine.strip("\n").split(" ")
-            if aLine[0] == "$":
-                if aLine[1] == "cd":
-                    self.cd(aLine[2])
-                if aLine[1] == "ls":
-                    pass
-            elif aLine[0] == "dir":
-                self.dir(aLine[1])
-            else:
-                self.add(int(aLine[0]))            
+        self.aLines = list(map(lambda x: x.strip(), aLines))
+        #print(self.aLines)
+        self.height = len(self.aLines)
+        self.width  = len(self.aLines[0])
+        self.aDirections = [LEFT, TOP, RIGHT, BOTTOM]
+        self.aMaxes = [0,0,0,0]
+        self.aPosition = [0,0,0,0]
+        #print(self)
     
-    def key(self, dir=None):
-        aCurr = []+self.aCurrent 
-        if (dir):
-            aCurr.append(dir)
+    def countVisibleTrees(self):
+        treeList = []
+        self.aMaxes = [[-1]*self.width,[-1]*self.height,[-1]*self.width,[-1]*self.height]
         
-        k = "-".join(aCurr)
-        print("key", k)
-        return k
+        for top in range(self.height):
+            bottom  = self.height - (1 + top)
+            for left in range(self.width):
+                right   = self.width - (1 + left)
+                treeValue = int(self.aLines[top][left])
+                if treeValue > self.aMaxes[TOP][left]:
+                    treeList.append((top,left))
+                    self.aMaxes[TOP][left] = treeValue
+                
+                if treeValue > self.aMaxes[LEFT][top]:
+                    treeList.append((top,left))
+                    self.aMaxes[LEFT][top] = treeValue
+                
+                treeValue = int(self.aLines[bottom][right])
+                if treeValue > self.aMaxes[BOTTOM][right]:
+                    treeList.append((bottom,right))
+                    self.aMaxes[BOTTOM][right] = treeValue
+                
+                if treeValue > self.aMaxes[RIGHT][bottom]:
+                    treeList.append((bottom,right))
+                    self.aMaxes[RIGHT][bottom] = treeValue
+        '''        
+        print("treeList",treeList)
+        print("treeList",set(treeList))
+        print(len(set(treeList)))
+        '''
+                     
+        return len(set(treeList))
     
-    def dir(self, dir):
-        self.dSizes[self.key(dir)] = 0
+    def getTree(self, y, x):
+        if y<0 or x<0:
+            return -1
+        try:
+            return self.aLines[y][x]
+        except:
+            print("getTree failed",y,x)
+            return -1 
         
-    def cd(self, dir):
-        if dir == "..":
-            self.aCurrent.pop()
-            self.aCurrentKeys.pop()
-        else :
-            self.aCurrent.append(dir)
-            self.aCurrentKeys.append(self.key())
-        print("cd", dir, self.aCurrent, self.aCurrentKeys)
-    
-    def add(self, size):
-        print("Adding", size , "to",self.key())
-        for key in self.aCurrentKeys:
-            self.dSizes[key] += size
-    
-    def atMost100000(self):
-        atMost = {key:size for key, size in self.dSizes.items() if size <= 100000}
-        print(sum(atMost.values()), atMost)
-        return sum(atMost.values())
-    
-    def smallestDelete(self):
-        free = self.iFileSystem - self.dSizes["/"]
-        diff = self.requiredSpace - free
-        print(diff)
+    def lookSomeWhere(self, y, x, dir):
+        start = self.getTree(y, x)
+        print("y=",y, "x=",x, " start=",start, " dir=", dir)
+        found = 0
+        count = 0
+        while (True):
+            if(dir == TOP):
+                y -= 1
+            if(dir == BOTTOM):
+                y += 1
+            if(dir == LEFT):
+                x -= 1
+            if(dir == RIGHT):
+                x += 1
+            next = self.getTree(y,x)
+            print("next", next,y,x)
+            if (next == -1):
+                break
+            count += 1
+            if (next >= start):
+                break
+        print("count=", count)
         
-        atMin = {key:size for key, size in self.dSizes.items() if size >= diff}
-        print(min(atMin.values()), atMin)
-        return min(atMin.values())
+        return count 
     
+    
+    def scenicScore(self, y, x):
+        score = 1
+        for dir in self.aDirections:
+            score *= self.lookSomeWhere(y, x, dir)
         
+        print("x=",x," y=",y, " score=", score)
+        return score
+    
+    def maxScenicScore(self):
+        maxScore = 0
+        for x in range(self.width):
+            for y in range(self.height):
+                newScore = self.scenicScore(y,x)
+                if newScore > maxScore:
+                    maxScore = newScore
+        return maxScore
             
-
-with open("Day 7/test.txt","r") as file:
-    listing = Listing(file.readlines())
-    assert listing.atMost100000() == 95437
-    assert listing.smallestDelete() == 24933642
-    
-
+with open("Day 8/test.txt","r") as file:
+    trees = TreeMap(file.readlines())
+    assert trees.countVisibleTrees() == 21
+    assert trees.scenicScore(0,2) == 0
+    assert trees.scenicScore(1,4) == 0
+    assert trees.scenicScore(1,2) == 4
+    assert trees.scenicScore(3,2) == 8
+    assert trees.maxScenicScore() == 8
  
-with open("Day 7/input.txt","r") as file2:
-    listing2 = Listing(file2.readlines())
-    print(listing2.atMost100000())
-    print("smallestDelete", listing2.smallestDelete())
-
+ 
+with open("Day 8/input.txt","r") as file2:
+    trees2 = TreeMap(file2.readlines())
+    print("countVisibleTrees", trees2.countVisibleTrees())
+    print("maxScenicScore", trees2.maxScenicScore())
